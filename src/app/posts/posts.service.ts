@@ -27,7 +27,8 @@ export class PostsService {
     return postData.posts.map(post =>  {
       return { title: post.title,
                content: post.content,
-               id: post._id}
+               id: post._id,
+              imagePath : post.imagePath}
              })
     }))
     .subscribe(transformedPost => {
@@ -51,12 +52,17 @@ export class PostsService {
     );
   }
 
-  addPost(title: string, content: string){
-    const post : Post = {id: null, title: title, content: content} ;
-    this.http.post<{message: string, postId: string}>('http://localhost:3000/api/posts',post)
+  addPost(title: string, content: string , image :File){
+    //const post : Post = {id: null, title: title, content: content} ;
+    const postData = new FormData();
+    postData.append("title",title);
+    postData.append("content",content);
+    postData.append("image",image , title)
+    this.http.post<{message: string, post: Post}>('http://localhost:3000/api/posts',postData)
     .subscribe((responseData)=>{
-       const id= responseData.postId;
-       post.id = id;
+      const post :Post = {id: responseData.post.id,title:title, content: content, imagePath: responseData.post.imagePath}
+      //  const id= responseData.postId;
+      //  post.id = id;
        this.posts.push(post);
        this.postsUpdated.next([...this.posts]);
        this.router.navigate(["/"]);
@@ -66,7 +72,7 @@ export class PostsService {
   }
 
   updatePost(id: string, title: string, content: string){
-    const post : Post = {id: id, title: title, content: content} ;
+    const post : Post = {id: id, title: title, content: content , imagePath:null} ;
     this.http.put('http://127.0.0.1:3000/api/posts/'+ id, post)
     .subscribe(response => {
       const updatedPost = [...this.posts];
