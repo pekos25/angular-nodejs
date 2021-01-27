@@ -24,7 +24,7 @@ router.post("/singup", (req, res , next)=> {
         })
         .catch(err=>{
             res.status(500).json({
-                error: err
+                message : "Invalid authentication credentials!"
             });
         })
     })
@@ -52,12 +52,13 @@ router.post("/login", (req, res, next)=>{
             {expiresIn : "1h"});
         res.status(200).json({
             token: token,
-            expiresIn : 3600
+            expiresIn : 3600,
+            userId: logedUser._id
         })
          
     }).catch(err =>{
         return res.status(401).json({
-            message: 'Auth failed'
+            message: 'Invalid authentication credentials'
         })
     })
 })
